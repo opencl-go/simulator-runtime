@@ -66,8 +66,14 @@ var platformInfoDefaults = map[uint32]Information{
 	C.CL_PLATFORM_HOST_TIMER_RESOLUTION:   InfoUint64(0),
 }
 
-// PlatformInfo returns the raw byte value for the queried information.
-func PlatformInfo(infoName uint32) ([]byte, bool) {
+// NewPlatform returns a new instance.
+func NewPlatform() *Platform {
+	platform := Platform{}
+	return &platform
+}
+
+// Info returns the raw byte value for the queried information.
+func (p *Platform) Info(infoName uint32) ([]byte, bool) {
 	info, known := platformInfoDefaults[infoName]
 	if !known {
 		return nil, false
