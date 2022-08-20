@@ -7,6 +7,7 @@
 static cl_icd_dispatch globalDispatch = (struct _cl_icd_dispatch){
     clGetPlatformIDs,
     clGetPlatformInfo,
+    clGetDeviceIDs,
 };
 static struct _cl_platform_id simulatorPlatform = (struct _cl_platform_id){&globalDispatch, 0};
 static struct _cl_platform_id *availablePlatforms[1] =
@@ -14,7 +15,7 @@ static struct _cl_platform_id *availablePlatforms[1] =
     &simulatorPlatform
 };
 
-extern uintptr_t simGetPlatform();
+extern uintptr_t goGetSimulatorPlatformHandle();
 
 CL_API_ENTRY cl_int CL_API_CALL
     clGetPlatformIDs(cl_uint num_entries, cl_platform_id *platforms, cl_uint *num_platforms)
@@ -26,7 +27,7 @@ CL_API_ENTRY cl_int CL_API_CALL
     size_t availablePlatformCount = (sizeof(availablePlatforms) / sizeof(availablePlatforms[0]));
     if (num_entries > 0)
     {
-        simulatorPlatform.goHandle = simGetPlatform();
+        simulatorPlatform.goHandle = goGetSimulatorPlatformHandle();
 
         size_t reportedPlatformCount = (availablePlatformCount > num_entries) ? num_entries : availablePlatformCount;
         memset(platforms, 0x00, sizeof(cl_platform_id) * (size_t)(num_entries));
