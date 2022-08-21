@@ -57,13 +57,46 @@ func (InfoZero) Value() []byte {
 	return nil
 }
 
+// InfoVersion specializes the Information type as a Version.
+type InfoVersion Version
+
+// Value returns the serialized form of the version in host byte order.
+func (value InfoVersion) Value() []byte {
+	bytes := make([]byte, 4)
+	hostByteOrder.PutUint32(bytes, uint32(value))
+	return bytes
+}
+
+// InfoNameVersion specializes the Information type as a list of named versions.
+type InfoNameVersion []NameVersion
+
+// Value returns the serialized form the of the list.
+func (value InfoNameVersion) Value() []byte {
+	var rawStruct C.cl_name_version
+	rawStructSize := unsafe.Sizeof(rawStruct)
+	bytes := make([]byte, rawStructSize*uintptr(len(value)))
+	structOffset := uintptr(0)
+	versionOffset := unsafe.Offsetof(rawStruct.version)
+	nameOffset := unsafe.Offsetof(rawStruct.name)
+	for _, entry := range value {
+		copy(bytes[structOffset+nameOffset:structOffset+nameOffset+NameVersionNameMaxByteLength], []byte(entry.Name()))
+		hostByteOrder.PutUint32(bytes[structOffset+versionOffset:structOffset+versionOffset+4], uint32(entry.Version))
+		structOffset += rawStructSize
+	}
+	return bytes
+}
+
 var platformInfoDefaults = map[uint32]Information{
-	C.CL_PLATFORM_PROFILE:                 InfoString("FULL_PROFILE"),
-	C.CL_PLATFORM_NAME:                    InfoString("runtime-simulator"),
-	C.CL_PLATFORM_VENDOR:                  InfoString("github.com/opencl-go"),
-	C.CL_PLATFORM_EXTENSIONS:              InfoString(""),
-	C.CL_PLATFORM_EXTENSIONS_WITH_VERSION: InfoZero{},
-	C.CL_PLATFORM_HOST_TIMER_RESOLUTION:   InfoUint64(0),
+	C.CL_PLATFORM_PROFILE:    InfoString("FULL_PROFILE"),
+	C.CL_PLATFORM_NAME:       InfoString("runtime-simulator"),
+	C.CL_PLATFORM_VENDOR:     InfoString("github.com/opencl-go"),
+	C.CL_PLATFORM_EXTENSIONS: InfoString("cl_khr_icd"),
+	C.CL_PLATFORM_EXTENSIONS_WITH_VERSION: InfoNameVersion{
+		NameVersion{Version: VersionOf(1, 0, 0), name: "cl_khr_icd"},
+	},
+	C.CL_PLATFORM_HOST_TIMER_RESOLUTION: InfoUint64(0),
+	C.CL_PLATFORM_VERSION:               InfoString("OpenCL 3.0 "),
+	C.CL_PLATFORM_NUMERIC_VERSION:       InfoVersion(VersionOf(3, 0, 0)),
 }
 
 // NewPlatform returns a new instance.
