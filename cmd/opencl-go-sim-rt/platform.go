@@ -30,8 +30,8 @@ func goGetPlatformInfo(platformHandle C.uintptr_t, paramName C.cl_platform_info,
 	platform := cgo.Handle(platformHandle).Value().(*sim.Platform)
 	if paramName == C.CL_PLATFORM_ICD_SUFFIX_KHR {
 		return dataToCaller(sim.InfoString("GoSim").Value(), paramValueSize, paramValue, paramValueSizeRet)
-	} else if value, known := platform.Info(uint32(paramName)); known {
-		return dataToCaller(value, paramValueSize, paramValue, paramValueSizeRet)
+	} else if info := platform.Info(uint32(paramName)); info != nil {
+		return dataToCaller(info.Value(), paramValueSize, paramValue, paramValueSizeRet)
 	}
 	return C.CL_INVALID_VALUE
 }
