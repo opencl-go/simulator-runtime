@@ -16,36 +16,44 @@ type PlatformInfo struct {
 	Extensions []NameVersion
 }
 
-// ExtensionNames returns a space separated list of extension names.
-func (info PlatformInfo) ExtensionNames() string {
+// ExtensionNames returns a list of extension names.
+func (info PlatformInfo) ExtensionNames() []string {
 	names := make([]string, 0, len(info.Extensions))
 	for _, extension := range info.Extensions {
 		names = append(names, extension.Name())
 	}
-	return strings.Join(names, " ")
+	return names
 }
 
 // Platform handles all the operations of this runtime simulator.
 type Platform struct {
-	info PlatformInfo
+	info          PlatformInfo
+	infoOverrides map[uint32]Information
 }
 
 // NewPlatform returns a new instance.
 func NewPlatform() *Platform {
-	platform := Platform{info: PlatformInfo{
-		Name:    "runtime-simulator",
-		Vendor:  "github.com/opencl-go",
-		Profile: "FULL_PROFILE",
-		Version: VersionOf(3, 0, 0),
-		Extensions: []NameVersion{
-			{Version: VersionOf(1, 0, 0), name: "cl_khr_icd"},
+	platform := Platform{
+		info: PlatformInfo{
+			Name:    "runtime-simulator",
+			Vendor:  "github.com/opencl-go",
+			Profile: "FULL_PROFILE",
+			Version: VersionOf(3, 0, 0),
+			Extensions: []NameVersion{
+				{Version: VersionOf(1, 0, 0), name: "cl_khr_icd"},
+			},
 		},
-	}}
+		infoOverrides: make(map[uint32]Information),
+	}
 	return &platform
 }
 
 // Info returns the raw byte value for the queried information.
 func (p *Platform) Info(infoName uint32) Information {
+	if override, overridden := p.infoOverrides[infoName]; overridden {
+		return override
+	}
+
 	switch infoName {
 	case C.CL_PLATFORM_PROFILE:
 		return InfoString(p.info.Profile)
@@ -54,7 +62,7 @@ func (p *Platform) Info(infoName uint32) Information {
 	case C.CL_PLATFORM_VENDOR:
 		return InfoString(p.info.Vendor)
 	case C.CL_PLATFORM_EXTENSIONS:
-		return InfoString(p.info.ExtensionNames())
+		return InfoString(strings.Join(p.info.ExtensionNames(), " "))
 	case C.CL_PLATFORM_EXTENSIONS_WITH_VERSION:
 		return InfoNameVersion(p.info.Extensions)
 	case C.CL_PLATFORM_HOST_TIMER_RESOLUTION:
@@ -65,4 +73,14 @@ func (p *Platform) Info(infoName uint32) Information {
 		return InfoVersion(p.info.Version)
 	}
 	return nil
+}
+
+// SetInfo sets and overrides any information the platform provides.
+func (p *Platform) SetInfo(infoName uint32, value Information) {
+	p.infoOverrides[infoName] = value
+}
+
+// ResetInfo clears any information override.
+func (p *Platform) ResetInfo(infoName uint32) {
+	delete(p.infoOverrides, infoName)
 }
