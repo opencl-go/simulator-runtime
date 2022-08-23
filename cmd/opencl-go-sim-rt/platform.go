@@ -3,31 +3,57 @@ package main
 // #include "api.h"
 import "C"
 import (
-	"runtime/cgo"
 	"sync"
+	"unsafe"
 
+	"github.com/opencl-go/simulator-runtime/internal/server"
 	"github.com/opencl-go/simulator-runtime/internal/sim"
 )
 
 var (
-	startup                 sync.Once
-	simulatorPlatform       *sim.Platform
-	simulatorPlatformHandle cgo.Handle
+	startup           sync.Once
+	simulatorPlatform *sim.Platform
+	rpcServer         *server.Server
 )
 
-//export goGetSimulatorPlatformHandle
-func goGetSimulatorPlatformHandle() C.uintptr_t {
-	startup.Do(func() {
-		simulatorPlatform = sim.NewPlatform()
-		simulatorPlatformHandle = cgo.NewHandle(simulatorPlatform)
-	})
-	return C.uintptr_t(uintptr(simulatorPlatformHandle))
+type objectAllocatorFunc func(ref any) *DispatchObject
+
+func (f objectAllocatorFunc) New(ref any) sim.APIObject {
+	return f(ref)
+}
+
+//export goGetPlatformIDs
+func goGetPlatformIDs(platformCount C.cl_uint, platformsPtr *C.cl_platform_id, platformCountRet *C.cl_uint) C.cl_int {
+	if ((platformCount > 0) && (platformsPtr == nil)) || ((platformsPtr == nil) && (platformCountRet == nil)) {
+		return C.CL_INVALID_VALUE
+	}
+	if platformCountRet != nil {
+		*platformCountRet = 1
+	}
+	if platformCount > 0 {
+		platforms := unsafe.Slice((*uintptr)(unsafe.Pointer(platformsPtr)), uint32(platformCount))
+		for i := uint32(0); i < uint32(platformCount); i++ {
+			platforms[i] = 0
+		}
+		startup.Do(func() {
+			simulatorPlatform = sim.NewPlatform(objectAllocatorFunc(NewDispatchObject))
+			var err error
+			rpcServer, err = server.StartServer(simulatorPlatform)
+			var serverAddress string
+			if err == nil {
+				serverAddress = rpcServer.Address().String()
+			}
+			simulatorPlatform.SetInfo(rpcServer.AddressPlatformInfoName(), sim.InfoString(serverAddress))
+		})
+		platforms[0] = uintptr(simulatorPlatform.ID())
+	}
+	return C.CL_SUCCESS
 }
 
 //export goGetPlatformInfo
-func goGetPlatformInfo(platformHandle C.uintptr_t, paramName C.cl_platform_info,
+func goGetPlatformInfo(platformHandle C.uint64_t, paramName C.cl_platform_info,
 	paramValueSize C.size_t, paramValue *C.void, paramValueSizeRet *C.size_t) C.cl_int {
-	platform := cgo.Handle(platformHandle).Value().(*sim.Platform)
+	platform := DispatchObjectFrom(uint64(platformHandle)).Ref().(*sim.Platform)
 	if paramName == C.CL_PLATFORM_ICD_SUFFIX_KHR {
 		return dataToCaller(sim.InfoString("GoSim").Value(), paramValueSize, paramValue, paramValueSizeRet)
 	} else if info := platform.Info(uint32(paramName)); info != nil {
@@ -37,7 +63,7 @@ func goGetPlatformInfo(platformHandle C.uintptr_t, paramName C.cl_platform_info,
 }
 
 //export goGetDeviceIDs
-func goGetDeviceIDs(platformHandle C.uintptr_t, deviceType C.cl_device_type,
+func goGetDeviceIDs(platformHandle C.uint64_t, deviceType C.cl_device_type,
 	deviceCount C.cl_uint, devices *C.cl_device_id, deviceCountRet *C.cl_uint) C.cl_int {
 	return C.CL_OUT_OF_RESOURCES
 }
