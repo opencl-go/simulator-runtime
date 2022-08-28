@@ -20,3 +20,20 @@ CL_API_ENTRY cl_int CL_API_CALL
     return goGetDeviceInfo(((goDispatchObject*)(device))->handle,
         param_name, param_value_size, param_value, param_value_size_ret);
 }
+
+CL_API_ENTRY cl_int CL_API_CALL clCreateSubDevices(cl_device_id in_device,
+    const cl_device_partition_property *properties,
+    cl_uint num_devices, cl_device_id *out_devices, cl_uint *num_devices_ret)
+{
+    return CL_OUT_OF_RESOURCES;
+}
+
+CL_API_ENTRY cl_int CL_API_CALL clRetainDevice(cl_device_id device)
+{
+    return CL_OUT_OF_RESOURCES;
+}
+
+CL_API_ENTRY cl_int CL_API_CALL clReleaseDevice(cl_device_id device)
+{
+    return CL_OUT_OF_RESOURCES;
+}

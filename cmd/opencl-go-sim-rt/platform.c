@@ -17,3 +17,13 @@ CL_API_ENTRY cl_int CL_API_CALL
 {
     return goGetPlatformInfo(((goDispatchObject*)(platform))->handle, param_name, param_value_size, param_value, param_value_size_ret);
 }
+
+CL_API_ENTRY cl_int CL_API_CALL clUnloadPlatformCompiler(cl_platform_id platform)
+{
+    return CL_OUT_OF_RESOURCES;
+}
+
+CL_API_ENTRY void *CL_API_CALL clGetExtensionFunctionAddressForPlatform(cl_platform_id platform, const char *func_name)
+{
+    return NULL;
+}
