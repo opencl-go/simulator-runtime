@@ -17,13 +17,3 @@ CL_API_ENTRY cl_int CL_API_CALL
 {
     return goGetPlatformInfo(((goDispatchObject*)(platform))->handle, param_name, param_value_size, param_value, param_value_size_ret);
 }
-
-extern cl_int goGetDeviceIDs(uint64_t platformHandle, cl_device_type device_type,
-    cl_uint num_entries, cl_device_id *devices, cl_uint *num_devices);
-
-CL_API_ENTRY cl_int CL_API_CALL
-    clGetDeviceIDs(cl_platform_id platform, cl_device_type device_type,
-        cl_uint num_entries, cl_device_id *devices, cl_uint *num_devices)
-{
-    return goGetDeviceIDs(((goDispatchObject*)(platform))->handle, device_type, num_entries, devices, num_devices);
-}

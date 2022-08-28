@@ -140,3 +140,13 @@ func (platform *Platform) Devices() []*Device {
 	}
 	return devices
 }
+
+// DeleteDevice removes the identified device from the platform.
+func (platform *Platform) DeleteDevice(id ObjectID) {
+	platform.mutex.Lock()
+	defer platform.mutex.Unlock()
+
+	device := platform.devices[id]
+	delete(platform.devices, id)
+	device.Delete()
+}

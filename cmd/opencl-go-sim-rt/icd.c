@@ -7,6 +7,12 @@ static cl_icd_dispatch globalDispatch = (struct _cl_icd_dispatch){
     clGetPlatformIDs,
     clGetPlatformInfo,
     clGetDeviceIDs,
+    clGetDeviceInfo,
+    clCreateContext,
+    clCreateContextFromType,
+    clRetainContext,
+    clReleaseContext,
+    clGetContextInfo,
 };
 
 goDispatchObject *newDispatchObject(uint64_t handle)
