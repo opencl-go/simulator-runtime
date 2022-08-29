@@ -33,3 +33,9 @@ CL_API_ENTRY cl_int CL_API_CALL clGetContextInfo(cl_context context,
 {
     return CL_OUT_OF_RESOURCES;
 }
+
+CL_API_ENTRY cl_int CL_API_CALL clSetContextDestructorCallback(cl_context context,
+    void (CL_CALLBACK *pfn_notify)(cl_context context, void *user_data), void *user_data)
+{
+    return CL_OUT_OF_RESOURCES;
+}

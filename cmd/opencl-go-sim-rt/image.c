@@ -14,6 +14,14 @@ CL_API_ENTRY cl_mem CL_API_CALL clCreateImage(cl_context context,
     return NULL;
 }
 
+CL_API_ENTRY cl_mem CL_API_CALL clCreateImageWithProperties(cl_context context,
+    const cl_mem_properties *properties,
+    cl_mem_flags flags, const cl_image_format *image_format, const cl_image_desc *image_desc, void *host_ptr,
+    cl_int *errcode_ret)
+{
+    return NULL;
+}
+
 CL_API_ENTRY cl_int CL_API_CALL clGetImageInfo(cl_mem image,
     cl_image_info param_name, size_t param_value_size, void *param_value, size_t *param_value_size_ret)
 {

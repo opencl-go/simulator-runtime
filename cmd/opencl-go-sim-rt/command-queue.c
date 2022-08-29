@@ -7,6 +7,13 @@ CL_API_ENTRY cl_command_queue CL_API_CALL clCreateCommandQueue(cl_context contex
     return NULL;
 }
 
+CL_API_ENTRY cl_command_queue CL_API_CALL clCreateCommandQueueWithProperties(cl_context context,
+    cl_device_id device, const cl_queue_properties *properties,
+    cl_int *errcode_ret)
+{
+    return NULL;
+}
+
 CL_API_ENTRY cl_int CL_API_CALL clRetainCommandQueue(cl_command_queue command_queue)
 {
     return CL_OUT_OF_RESOURCES;

@@ -7,6 +7,13 @@ CL_API_ENTRY cl_sampler CL_API_CALL clCreateSampler(cl_context context,
     return NULL;
 }
 
+CL_API_ENTRY cl_sampler CL_API_CALL clCreateSamplerWithProperties(cl_context context,
+    const cl_sampler_properties *sampler_properties,
+    cl_int *errcode_ret)
+{
+    return NULL;
+}
+
 CL_API_ENTRY cl_int CL_API_CALL clRetainSampler(cl_sampler sampler)
 {
     return CL_OUT_OF_RESOURCES;

@@ -118,9 +118,10 @@ static cl_icd_dispatch globalDispatch = (struct _cl_icd_dispatch){
     clEnqueueMarkerWithWaitList,
     clEnqueueBarrierWithWaitList,
     clGetExtensionFunctionAddressForPlatform,
-
     NULL, // clCreateFromGLTexture
+
     NULL, // clGetDeviceIDsFromD3D11KHR
+    NULL, // clCreateFromD3D11BufferKHR
     NULL, // clCreateFromD3D11Texture2DKHR
     NULL, // clCreateFromD3D11Texture3DKHR
     NULL, // clCreateFromDX9MediaSurfaceKHR
@@ -136,6 +137,37 @@ static cl_icd_dispatch globalDispatch = (struct _cl_icd_dispatch){
     NULL, // clEnqueueReleaseEGLObjectsKHR
 
     NULL, // clCreateEventFromEGLSyncKHR
+
+    clCreateCommandQueueWithProperties,
+    clCreatePipe,
+    clGetPipeInfo,
+    clSVMAlloc,
+    clSVMFree,
+    clEnqueueSVMFree,
+    clEnqueueSVMMemcpy,
+    clEnqueueSVMMemFill,
+    clEnqueueSVMMap,
+    clEnqueueSVMUnmap,
+    clCreateSamplerWithProperties,
+    clSetKernelArgSVMPointer,
+    clSetKernelExecInfo,
+
+    NULL, // clGetKernelSubGroupInfoKHR
+
+    clCloneKernel,
+    clCreateProgramWithIL,
+    clEnqueueSVMMigrateMem,
+    clGetDeviceAndHostTimer,
+    clGetHostTimer,
+    clGetKernelSubGroupInfo,
+    clSetDefaultDeviceCommandQueue,
+
+    clSetProgramReleaseCallback,
+    clSetProgramSpecializationConstant,
+
+    clCreateBufferWithProperties,
+    clCreateImageWithProperties,
+    clSetContextDestructorCallback,
 };
 
 goDispatchObject *newDispatchObject(uint64_t handle)

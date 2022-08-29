@@ -37,3 +37,21 @@ CL_API_ENTRY cl_int CL_API_CALL clReleaseDevice(cl_device_id device)
 {
     return CL_OUT_OF_RESOURCES;
 }
+
+CL_API_ENTRY cl_int CL_API_CALL clSetDefaultDeviceCommandQueue(cl_context context,
+    cl_device_id device, cl_command_queue command_queue)
+{
+    return CL_OUT_OF_RESOURCES;
+}
+
+CL_API_ENTRY cl_int CL_API_CALL clGetDeviceAndHostTimer(cl_device_id device,
+    cl_ulong *device_timestamp, cl_ulong *host_timestamp)
+{
+    return CL_OUT_OF_RESOURCES;
+}
+
+CL_API_ENTRY cl_int CL_API_CALL clGetHostTimer(cl_device_id device,
+    cl_ulong *host_timestamp)
+{
+    return CL_OUT_OF_RESOURCES;
+}
