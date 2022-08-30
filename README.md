@@ -23,6 +23,7 @@ Refer to [the documentation on opencl-go][opencl-go] on how to do this.
 cd cmd/opencl-go-sim-rt
 go build -buildmode c-shared .
 mkdir --parents /etc/OpenCL/vendors
+# as root:
 echo "(path-to-so)/opencl-go-sim-rt" > /etc/OpenCL/vendors/opencl-go-simulator.icd
 ```
 

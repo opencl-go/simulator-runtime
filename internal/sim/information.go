@@ -35,6 +35,23 @@ func (value InfoString) Value() []byte {
 	return append([]byte(value), 0x00)
 }
 
+// InfoUintptr specializes the Information type by representing an uintptr value, which is dependent on address size.
+type InfoUintptr uintptr
+
+// Value returns the number serialized in host byte order.
+func (value InfoUintptr) Value() []byte {
+	bytes := make([]byte, unsafe.Sizeof(value))
+	switch len(bytes) {
+	case 4:
+		hostByteOrder.PutUint32(bytes, uint32(value))
+	case 8:
+		hostByteOrder.PutUint64(bytes, uint64(value))
+	default:
+		panic("unsupported address size")
+	}
+	return bytes
+}
+
 // InfoUint64 specializes the Information type by representing a 64 bit value.
 type InfoUint64 uint64
 

@@ -1,15 +1,24 @@
 package sim
 
+// #include "../api/api.h"
 import "C"
 import (
+	"fmt"
 	"sync"
 )
 
+// DeviceInfo contains all common platform information fields.
+type DeviceInfo struct {
+	PlatformID ObjectID
+	Name       string
+	Vendor     string
+}
+
 // Device simulates the behaviour of one OpenCL device.
 type Device struct {
-	mutex      sync.Mutex
-	platformID ObjectID
-	object     APIObject
+	mutex  sync.Mutex
+	object APIObject
+	info   DeviceInfo
 
 	infoOverrides map[uint32]Information
 }
@@ -17,10 +26,14 @@ type Device struct {
 // NewDevice creates a new instance.
 func NewDevice(platformID ObjectID, allocator APIObjectAllocator) *Device {
 	device := &Device{
-		mutex:      sync.Mutex{},
-		platformID: platformID,
+		mutex: sync.Mutex{},
+		info: DeviceInfo{
+			PlatformID: platformID,
+			Vendor:     "github.com/opencl-go",
+		},
 	}
 	device.object = allocator.New(device)
+	device.info.Name = fmt.Sprintf("Dynamic Device %v", device.object.ID())
 	return device
 }
 
@@ -48,7 +61,14 @@ func (device *Device) Info(infoName uint32) Information {
 	if override, overridden := device.infoOverrides[infoName]; overridden {
 		return override
 	}
-	// TODO: any fixed info
+	switch infoName {
+	case C.CL_DEVICE_PLATFORM:
+		return InfoUintptr(device.info.PlatformID)
+	case C.CL_DEVICE_VENDOR:
+		return InfoString(device.info.Vendor)
+	case C.CL_DEVICE_NAME:
+		return InfoString(device.info.Name)
+	}
 	return nil
 }
 
