@@ -23,7 +23,9 @@ CL_API_ENTRY cl_int CL_API_CALL clUnloadPlatformCompiler(cl_platform_id platform
     return CL_OUT_OF_RESOURCES;
 }
 
+extern uintptr_t goGetExtensionFunctionAddressForPlatform(uint64_t platformHandle, char *func_name);
+
 CL_API_ENTRY void *CL_API_CALL clGetExtensionFunctionAddressForPlatform(cl_platform_id platform, const char *func_name)
 {
-    return NULL;
+    return (void *)(goGetExtensionFunctionAddressForPlatform(((goDispatchObject*)(platform))->handle, (char *)(func_name)));
 }

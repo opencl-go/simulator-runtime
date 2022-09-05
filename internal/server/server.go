@@ -26,10 +26,15 @@ func StartServer(simPlatform *intSim.Platform) (*Server, error) {
 	}
 	// Register listener.Addr()
 	grpcServer := grpc.NewServer()
+	platformService := &PlatformService{
+		UnimplementedPlatformServer: extSim.UnimplementedPlatformServer{},
+		platform:                    simPlatform,
+	}
 	devicesService := &DevicesService{
 		UnimplementedDevicesServer: extSim.UnimplementedDevicesServer{},
 		platform:                   simPlatform,
 	}
+	extSim.RegisterPlatformServer(grpcServer, platformService)
 	extSim.RegisterDevicesServer(grpcServer, devicesService)
 	server := &Server{
 		grpcServer: grpcServer,

@@ -61,3 +61,10 @@ func goGetPlatformInfo(platformHandle C.uint64_t, paramName C.cl_platform_info,
 	}
 	return C.CL_INVALID_VALUE
 }
+
+//export goGetExtensionFunctionAddressForPlatform
+func goGetExtensionFunctionAddressForPlatform(platformHandle C.uint64_t, rawFuncName *C.char) C.uintptr_t {
+	funcName := C.GoString(rawFuncName)
+	platform := DispatchObjectFrom(uint64(platformHandle)).Ref().(*sim.Platform)
+	return C.uintptr_t(platform.ExtensionFunctionAddress(funcName))
+}

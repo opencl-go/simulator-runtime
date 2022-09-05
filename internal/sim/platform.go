@@ -33,6 +33,9 @@ type Platform struct {
 	info          PlatformInfo
 	infoOverrides map[uint32]Information
 
+	extensionFunctionCounter uintptr
+	extensionFunctions       map[string]uintptr
+
 	object  APIObject
 	devices map[ObjectID]*Device
 }
@@ -51,8 +54,10 @@ func NewPlatform(allocator APIObjectAllocator) *Platform {
 				{Version: VersionOf(1, 0, 0), name: "cl_khr_icd"},
 			},
 		},
-		infoOverrides: make(map[uint32]Information),
-		devices:       make(map[ObjectID]*Device),
+		infoOverrides:            make(map[uint32]Information),
+		extensionFunctionCounter: 1,
+		extensionFunctions:       make(map[string]uintptr),
+		devices:                  make(map[ObjectID]*Device),
 	}
 	platform.object = allocator.New(platform)
 	return platform
@@ -116,6 +121,31 @@ func (platform *Platform) ResetInfo(infoName uint32) {
 	platform.mutex.Lock()
 	defer platform.mutex.Unlock()
 	delete(platform.infoOverrides, infoName)
+}
+
+// PrepareExtensionFunction allocates a new function address that can be retrieved.
+func (platform *Platform) PrepareExtensionFunction() (string, uintptr) {
+	platform.mutex.Lock()
+	defer platform.mutex.Unlock()
+	addr := platform.extensionFunctionCounter
+	platform.extensionFunctionCounter++
+	name := fmt.Sprintf("simExtensionFunction%v", addr)
+	platform.extensionFunctions[name] = addr
+	return name, addr
+}
+
+// ReleaseExtensionFunction removes a previously registered function.
+func (platform *Platform) ReleaseExtensionFunction(name string) {
+	platform.mutex.Lock()
+	defer platform.mutex.Unlock()
+	delete(platform.extensionFunctions, name)
+}
+
+// ExtensionFunctionAddress returns the address of allocated extension functions.
+func (platform *Platform) ExtensionFunctionAddress(name string) uintptr {
+	platform.mutex.Lock()
+	defer platform.mutex.Unlock()
+	return platform.extensionFunctions[name]
 }
 
 // CreateDevice adds a new device to the platform; The returned value is the device ID.
