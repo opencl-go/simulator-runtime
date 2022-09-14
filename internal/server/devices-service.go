@@ -22,7 +22,7 @@ func (service *DevicesService) Create(_ context.Context, _ *extSim.DeviceCreateR
 	}, nil
 }
 
-// Delete calls Platform.DeleteDevice()
+// Delete calls Platform.DeleteDevice().
 func (service *DevicesService) Delete(_ context.Context, request *extSim.DeviceDeleteRequest) (*extSim.DeviceDeleteResponse, error) {
 	service.platform.DeleteDevice(intSim.ObjectID(request.ID))
 	return &extSim.DeviceDeleteResponse{}, nil

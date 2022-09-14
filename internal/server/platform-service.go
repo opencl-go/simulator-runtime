@@ -14,7 +14,12 @@ type PlatformService struct {
 	platform *intSim.Platform
 }
 
-func (service *PlatformService) PrepareExtensionFunction(ctx context.Context, request *extSim.PlatformPrepareExtensionFunctionRequest) (*extSim.PlatformPrepareExtensionFunctionResponse, error) {
+// PrepareExtensionFunction calls Platform.PrepareExtensionFunction().
+func (service *PlatformService) PrepareExtensionFunction(
+	ctx context.Context,
+	request *extSim.PlatformPrepareExtensionFunctionRequest) (
+	*extSim.PlatformPrepareExtensionFunctionResponse,
+	error) {
 	name, addr := service.platform.PrepareExtensionFunction()
 	response := &extSim.PlatformPrepareExtensionFunctionResponse{
 		Name:    name,
@@ -23,7 +28,12 @@ func (service *PlatformService) PrepareExtensionFunction(ctx context.Context, re
 	return response, nil
 }
 
-func (service *PlatformService) ReleaseExtensionFunction(ctx context.Context, request *extSim.PlatformReleaseExtensionFunctionRequest) (*extSim.PlatformReleaseExtensionFunctionResponse, error) {
+// ReleaseExtensionFunction calls Platform.ReleaseExtensionFunction().
+func (service *PlatformService) ReleaseExtensionFunction(
+	ctx context.Context,
+	request *extSim.PlatformReleaseExtensionFunctionRequest) (
+	*extSim.PlatformReleaseExtensionFunctionResponse,
+	error) {
 	service.platform.ReleaseExtensionFunction(request.Name)
 	return &extSim.PlatformReleaseExtensionFunctionResponse{}, nil
 }
