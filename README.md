@@ -7,6 +7,9 @@ The intention is to provide a simulator that can be used during testing of the w
 
 **This is work in progress**
 
+**The repository is archived and unmaintained.
+Please see [Maintenance Notice](https://github.com/opencl-go/opencl-go.github.io/discussions/25) for further details.**
+
 ## Build and install
 
 You need to build the runtime library and register it as a potential vendor runtime.
